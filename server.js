@@ -5,8 +5,87 @@ var path = require('path');
 var app = express();
 app.use(morgan('combined'));
 
+var articles = {
+  'article-one': {
+    title: "Article one",
+    heading: "Article One",
+    date:"Aug 9,2017",
+    content: `<p>
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+              </p>
+              <p>
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+              </p>
+              <p>
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
+              </p>`
+  },
+  'article-two': {
+    title: "Article Two",
+    heading: "Article Two",
+    date:"Jun 9,2017",
+    content: `   <p>
+                   Content for second Article.
+                </p>`
+  },
+  'article-three': {
+    title: "Article Three",
+    heading: "Article Three",
+    date:"Dec 9,2017",
+    content: `   <p>
+                   Content for Third Article.
+                </p>`
+  }
+};
+
+function createTemplate(data){
+  var title = data.title;
+  var heading = data.heading;
+  var content = data.content;
+  var date = data.date;
+
+  var htmlTemplate = `<html>
+      <head>
+          <title>${title}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link href="/ui/style.css" rel="stylesheet" />
+      </head>
+      <body>
+          <div class="container">
+              <div>
+                  <a href="/">Home</a>
+              </div>
+              <hr/>
+              <h3>${heading}</h3>
+              <div>
+                  ${date}
+              </div>
+                ${content}
+          </div>
+      </body>
+  </html>`;
+
+  return htmlTemplate;
+}
+
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'ui', 'index.html'));
+});
+
+app.get('/:articleName', function(req, res){
+  var articleName = req.params.articleName;  
+  res.send(createTemplate(articles[articleName]));
+});
+
+app.get('/article-two', function(req, res){
+  res.sendFile(path.join(__dirname, 'ui', 'article-two.html'));;
+});
+
+app.get('/article-three', function(req, res){
+  res.sendFile(path.join(__dirname, 'ui', 'article-three.html'));;
 });
 
 app.get('/ui/style.css', function (req, res) {
@@ -21,7 +100,7 @@ app.get('/ui/madi.png', function (req, res) {
 // Do not change port, otherwise your app won't run on IMAD servers
 // Use 8080 only for local development if you already have apache running on 80
 
-var port = 80;
+var port = 8080;
 app.listen(port, function () {
   console.log(`IMAD course app listening on port ${port}!`);
 });
