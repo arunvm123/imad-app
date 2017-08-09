@@ -75,6 +75,22 @@ app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'ui', 'index.html'));
 });
 
+var counter = 0;
+app.get('/counter', function(req, res){
+  counter = counter + 1;
+  res.send(counter.toString());
+});
+
+
+var names = [];
+
+app.get("/submit-name", function(req, res){
+  name = req.query.name;
+  names.push(name); 
+  res.send(JSON.stringify(names));
+});
+
+
 app.get('/:articleName', function(req, res){
   var articleName = req.params.articleName;  
   res.send(createTemplate(articles[articleName]));

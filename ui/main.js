@@ -1,14 +1,47 @@
-console.log('Loaded!');
+var button = document.getElementById("counter");
+
+button.onclick = function(){
+
+    var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function(){
+        if(request.readyState === XMLHttpRequest.DONE){
+
+            if(request.status === 200){
+                var counter = request.responseText;
+                var span = document.getElementById("count");
+                span.innerHTML = counter.toString();
+            }   
+        }
+    };
+    request.open('GET', 'http://127.0.0.1:8080/counter', true);
+    request.send(null);
+};
 
 
 
-var img = document.getElementById("madi");
-var marginLeft1=0;
-function moveRight() {
-    marginLeft1 =marginLeft1 + 1;
-    img.style.marginLeft = marginLeft1 + 'px';
-}
+var submit = document.getElementById('submit_btn');
 
-img.onclick = function(){
-    var interval= setInterval(moveRight,50);
-}
+submit.onclick = function(){
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function(){
+            if(request.readyState === XMLHttpRequest.DONE){
+                if(request.status === 200){
+                    var names = request.responseText;
+                    console.log(names);
+                    names = JSON.parse(names);
+                    var list = '';
+                    for (var i = 0; i < names.length; i++){
+                        list += '<li>'+ names[i] + '</li>';
+                    }
+                    var ul = document.getElementById('namelist');
+                    ul.innerHTML = list; 
+                }   
+            }
+        };
+    var nameInput = document.getElementById('name');
+    var name = nameInput.value;
+    
+    request.open('GET', 'http://127.0.0.1:8080/submit-name?name='+name, true);
+    request.send(null);
+};
