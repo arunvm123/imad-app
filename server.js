@@ -1,45 +1,17 @@
 var express = require('express');
 var morgan = require('morgan');
 var path = require('path');
+var Pool = require('pg').Pool
+
+var config = {
+  user: 'arunvmathew95',
+  database: 'arunvmathew95',
+  host: 'db.imad.hasura-app.io',
+  password: process.env.DB_PASSWORD
+}
 
 var app = express();
 app.use(morgan('combined'));
-
-var articles = {
-  'article-one': {
-    title: "Article one",
-    heading: "Article One",
-    date:"Aug 9,2017",
-    content: `<p>
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-              </p>
-              <p>
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-              </p>
-              <p>
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-                  Some Random sentencesSome Random sentencesSome Random sentencesSome Random sentencesSome Random sentences
-              </p>`
-  },
-  'article-two': {
-    title: "Article Two",
-    heading: "Article Two",
-    date:"Jun 9,2017",
-    content: `   <p>
-                   Content for second Article.
-                </p>`
-  },
-  'article-three': {
-    title: "Article Three",
-    heading: "Article Three",
-    date:"Dec 9,2017",
-    content: `   <p>
-                   Content for Third Article.
-                </p>`
-  }
-};
 
 function createTemplate(data){
   var title = data.title;
@@ -61,7 +33,7 @@ function createTemplate(data){
               <hr/>
               <h3>${heading}</h3>
               <div>
-                  ${date}
+                  ${date.toDateString()}
               </div>
                 ${content}
           </div>
@@ -73,6 +45,18 @@ function createTemplate(data){
 
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'ui', 'index.html'));
+});
+
+
+var pool = new Pool(config);
+app.get('/test-db', function(req, res){
+  pool.query("Select * from test", function(err, result){
+    if(err){
+      res.status(500).send(err.toString());
+    }else{
+      res.send(JSON.stringify(result));
+    }
+  });
 });
 
 var counter = 0;
@@ -91,9 +75,19 @@ app.get("/submit-name", function(req, res){
 });
 
 
-app.get('/:articleName', function(req, res){
-  var articleName = req.params.articleName;  
-  res.send(createTemplate(articles[articleName]));
+app.get('/articles/:articleName', function(req, res){
+  pool.query("Select * from article where title = $1", [req.params.articleName], function(err, result){
+    if(err){
+      res.status(500).send(err.toString());
+    }else{
+      if(result.rows.length === 0){
+        res.status(404).send("Article not found");
+      }else{
+        var articleData = result.rows[0];
+        res.send(createTemplate(articleData));
+      }
+    }    
+  });
 });
 
 
