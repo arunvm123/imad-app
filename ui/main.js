@@ -1,25 +1,4 @@
-var button = document.getElementById("counter");
-
-button.onclick = function(){
-
-    var request = new XMLHttpRequest();
-
-    request.onreadystatechange = function(){
-        if(request.readyState === XMLHttpRequest.DONE){
-
-            if(request.status === 200){
-                var counter = request.responseText;
-                var span = document.getElementById("count");
-                span.innerHTML = counter.toString();
-            }   
-        }
-    };
-    request.open('GET', 'http://127.0.0.1:8080/counter', true);
-    request.send(null);
-};
-
-
-
+//Login
 var submit = document.getElementById('submit_btn');
 
 submit.onclick = function(){
@@ -27,21 +6,20 @@ submit.onclick = function(){
         request.onreadystatechange = function(){
             if(request.readyState === XMLHttpRequest.DONE){
                 if(request.status === 200){
-                    var names = request.responseText;
-                    console.log(names);
-                    names = JSON.parse(names);
-                    var list = '';
-                    for (var i = 0; i < names.length; i++){
-                        list += '<li>'+ names[i] + '</li>';
-                    }
-                    var ul = document.getElementById('namelist');
-                    ul.innerHTML = list; 
-                }   
+                    alert("login succesfull!");
+                }else if (request.status === 403){
+                    alert("Username/password incorrect");
+                }else if (request.status === 500){
+                    alert("something wrong woth server");
+                }
             }
         };
-    var nameInput = document.getElementById('name');
-    var name = nameInput.value;
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    console.log(username);
+    console.log(password);
     
-    request.open('GET', 'http://127.0.0.1:8080/submit-name?name='+name, true);
-    request.send(null);
+    request.open('POST', 'http://127.0.0.1:8080/login', true);
+    request.setRequestHeader('Content-Type', 'application/json');
+    request.send(JSON.stringify({username: username, password: password}));
 };
