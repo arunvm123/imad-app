@@ -19,7 +19,7 @@ submit.onclick = function(){
     console.log(username);
     console.log(password);
     
-    request.open('POST', 'http://127.0.0.1:8080/login', true);
+    request.open('POST', 'http://arunvmathew95.imad.hasura-app.io/login', true);
     request.setRequestHeader('Content-Type', 'application/json');
     request.send(JSON.stringify({username: username, password: password}));
 };
